@@ -50,6 +50,8 @@ class Controller
 		if ($id) {
 			$this->model->deleteUserById($id);
 		}
-		return View::render('reload');
+        return View::render('home', [
+            'model' => $this->model
+        ]);
 	}
 }

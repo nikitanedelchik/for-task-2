@@ -41,6 +41,7 @@ function getGender($genderParam = false): string
             </div>
         <?php endif; ?>
 		<div class="form-group">
+            <input type="hidden" name="id" value="<?= $model->id ?>">
 			<label for="exampleInputEmail1">Email address</label>
 			<input type="email" name="email" class="form-control<?= $model->hasError('email') ? ' is-invalid': ''?>"
                    placeholder="Enter email" value="<?= $model->email ?>" readonly>

@@ -2,13 +2,11 @@
 
 namespace app\core\models;
 
-use app\core\Database;
-
+use app\core\GoRest;
 use app\core\Validate;
 
 class Model
 {
-	private $connection;
     public $errors = [];
     public $success;
     public $name;
@@ -16,122 +14,66 @@ class Model
     public $gender;
     public $status;
     public $users;
+    private $gorest;
+    /**
+     * @var mixed
+     */
+    public $id;
 
     public function __construct()
-	{
-        $this->connection = Database::getConnection();
-	}
-
-    private function isSetEmail(): bool
     {
-        $isSet = false;
-        $sql = "SELECT email FROM `users`";
-        $sth = $this->connection->prepare($sql);
-        $sth->execute();
-        $array = $sth->fetchAll(\PDO::FETCH_ASSOC);
-        foreach ($array as $email) {
-            if ($email['email'] === $this->email) {
-                $this->errors['email'] = 'User with this email is already exist!';
-                $isSet = true;
-            }
-        }
-        return $isSet;
+        $this->gorest = new GoRest();
     }
 
-	public function createUser()
+    public function createUser()
 	{
-        try {
-            // проверка на существование пользователя с такой почтой
-            if ($this->isSetEmail()) {
-                return $this;
-            }
-            $sql = "INSERT INTO users (name, email, gender, status) VALUES (:name, :email, :gender, :status)";
-			$statm = $this->connection->prepare($sql);
-			$statm->bindParam(":name", $this->name);
-			$statm->bindParam(":email", $this->email);
-			$statm->bindParam(":gender", $this->gender);
-			$statm->bindParam(":status", $this->status);
-			$isOkey = $statm->execute();
-			if ($isOkey > 0) {
-				$create = true;
-                $this->success = 'User was created';
-			} else {
-                $create = false;
-			}
-		} catch (\PDOException $e) {
-			echo "DBError: " . $e->getMessage();
-		}
+        $res = $this->gorest->createUser($this->name, $this->email, $this->gender, $this->status);
+        if (isset($res[0]['message'])) {
+            $this->errors[$res[0]['field']] = $res[0]['message'];
+            $create = false;
+        } else {
+            $create = true;
+            $this->success = 'User was created';
+        }
+
 		return $create;
 	}
 
 	public function getAllUsers()
 	{
-		try {
-			$sql = "SELECT * FROM `users`";
-			$sth = $this->connection->prepare($sql);
-			$sth->execute();
-			$array = $sth->fetchAll(\PDO::FETCH_ASSOC);
-		} catch (\PDOException $exception) {
-			echo '<div class="alert alert-danger">Something wrong</div>';
-		}
-		return $this->users = $array;
+        $this->users = $this->gorest->getAll();
+        return $this->users;
 	}
 
 	public function deleteUserById($id)
 	{
-		try {
-			$sql = "DELETE FROM `users` WHERE id = $id";
-			$stmt = $this->connection->exec($sql);
-			if ($stmt) {
-				$res = true;
-			} else {
-				$res = false;
-			}
-		} catch (\PDOException $e) {
-			echo "Database error: " . $e->getMessage();
-		}
-		return $res;
+		$this->gorest->deleteUser($id);
+
+		return $this->getAllUsers();
 	}
 
-	public function editUserByEmail()
+	public function editUser()
 	{
-		try {
-			$sql = "UPDATE `users` SET name = :name, email = :email, gender = :gender, status = :status  WHERE email = :email";
-			$stmt = $this->connection->prepare($sql);
-			$stmt->bindParam(":name", $this->name);
-			$stmt->bindParam(":email", $this->email);
-			$stmt->bindParam(":gender", $this->gender);
-			$stmt->bindParam(":status", $this->status);
-			$isOkey = $stmt->execute();
-            if ($isOkey) {
-                $edit = true;
-                $this->success = 'User was edited';
-            } else {
-                $edit = false;
-            }
-		} catch (\PDOException $e) {
-			echo "Database error: " . $e->getMessage();
-		}
+        $result = $this->gorest->editUser($this->id, $this->name, $this->email, $this->gender, $this->status);
+        if (isset($result[0]['message'])) {
+            $this->errors[$result[0]['field']] = $result[0]['message'];
+            $edit = false;
+        } else {
+            $edit = true;
+            $this->success = 'User was edited';
+        }
+
 		return $edit;
 	}
 
 	public function getUserById($id)
 	{
-		try {
-			$sql = "SELECT * FROM `users` WHERE id = $id";
-			$sth = $this->connection->prepare($sql);
-			$isOkey = $sth->execute();
-			$array = $sth->fetch(\PDO::FETCH_ASSOC);
-            if ($isOkey) {
-                $this->name = $array['name'];
-                $this->email = $array['email'];
-                $this->gender = $array['gender'];
-                $this->status = $array['status'];
-            }
-		} catch (\PDOException $e) {
-			echo "Database error: " . $e->getMessage();
-		}
-		return $isOkey;
+		$user = $this->gorest->getUser($id);
+        $this->id = $user['id'];
+        $this->name = $user['name'];
+        $this->email = $user['email'];
+        $this->gender = $user['gender'];
+        $this->status = $user['status'];
 	}
 
     public function loadData($data)
@@ -159,7 +101,7 @@ class Model
         if (isset($data['create']) && $this->isValid()) {
             $this->createUser();
         } elseif (isset($data['edit']) && $this->isValid()) {
-            $this->editUserByEmail();
+            $this->editUser();
         }
     }
 
