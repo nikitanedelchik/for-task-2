@@ -1,0 +1,16 @@
+{
+    "name": "nikita-nedelchik/innowise",
+    "description": "my app",
+    "autoload": {
+        "psr-4": {
+            "app\\": "/usr/share/nginx/html/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nikita",
+            "email": "nikita.nedelchik@innowise-group.com"
+        }
+    ],
+    "require": {}
+}

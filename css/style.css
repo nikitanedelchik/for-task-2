@@ -1,0 +1,11 @@
+.form-group {
+	max-width: 400px;
+	margin-bottom: 30px;
+}
+.container {
+	max-width: 400px;
+}
+.table.container {
+	margin-top: 50px;
+	max-width: 70%;
+}
