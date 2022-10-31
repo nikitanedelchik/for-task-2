@@ -1,0 +1,27 @@
+{% extends 'main.twig' %}
+{% block body %}
+<div class="container">
+    {{ message }}
+    {% if size %}
+        <ul class="list-group mb-5">
+            <li class="list-group-item">File size: {{ size }}  bytes</li>
+            <li class="list-group-item">File name: {{ name }}</li>
+            <li class="list-group-item">File type: {{ type }}</li>
+        </ul>
+    {% endif %}
+    <form method="post" action="" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="exampleFormControlFile1">Upload a file</label>
+            <input type="file" class="form-control-file" name="file" id="file">
+        </div>
+        <button type="submit" name="upload">Upload file</button>
+    </form>
+    {% if files %}
+    <ul class="list-group mt-5">
+        {% for file in files %}
+            <li class="list-group-item">{{ file }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}
