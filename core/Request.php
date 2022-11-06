@@ -33,15 +33,25 @@ class Request
     {
         $body = [];
         if (self::isPost()) {
-            foreach ($_FILES as $key => $file) {
-                $body[$key] = $file;
+            foreach ($_POST as $key => $value) {
+                $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
             }
         }
         if (self::isGet()) {
-        foreach ($_GET as $key => $value) {
-            $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-        }
+            foreach ($_GET as $key => $value) {
+                $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+            }
         }
         return $body;
+    }
+
+    public static function getUploadedFileData(): array
+    {
+        $data = [];
+        foreach ($_FILES as $key => $file) {
+            $data[$key] = $file;
+        }
+
+        return $data;
     }
 }

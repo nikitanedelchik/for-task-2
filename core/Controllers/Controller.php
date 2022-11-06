@@ -2,31 +2,27 @@
 
 namespace app\core\Controllers;
 
-use app\core\Models\Model;
-use app\core\Request;
+use app\core\Helpers\FileHelper;
 use app\core\View;
 
 class Controller
 {
-    private Model $model;
+    private FileHelper $helper;
     private View $view;
 
     public function __construct()
     {
-        $this->model = new Model();
+        $this->helper = new FileHelper();
         $this->view = new View();
     }
 
-    public function upload()
+    public function upload(): string
     {
-        $this->model->uploadFile(Request::getRequestParams());
-
+        $data = $this->helper->uploadFile();
         return $this->view->renderView('home', [
-            'message' => $this->model->success ?: $this->model->errors[0],
-            'size' => $this->model->size,
-            'name' => $this->model->name,
-            'type' => $this->model->type,
-            'files' => $this->model->files
+            'file' => $data['file'],
+            'files' => $data['files'],
+            'message' => $data['message']
         ]);
     }
 }
