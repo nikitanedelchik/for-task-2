@@ -17,25 +17,25 @@ class Controller
 
     public function create()
     {
-        $this->model->createUser();
+        $model = $this->model->createUser();
         return View::render('create', [
-            'model' => $this->model
+            'model' => $model
         ]);
     }
 
     public function edit()
     {
-        $this->model->editUser();
+        $model = $this->model->editUser();
         return View::render('edit', [
-            'model' => $this->model
+            'model' => $model
         ]);
     }
 
     public function home()
     {
-       $this->model->getAllUsers();
+       $model = $this->model->getAllUsers();
        return View::render('home', [
-            'model' => $this->model
+            'model' => $model
         ]);
     }
 
@@ -43,10 +43,10 @@ class Controller
     {
        $id = Request::getRequestParams()['id'] ?? false;
        if ($id) {
-           $this->model->deleteUserById($id);
+           $model = $this->model->deleteUserById($id);
        }
         return View::render('home', [
-            'model' => $this->model
+            'model' => $model
         ]);
     }
 }
