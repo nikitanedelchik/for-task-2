@@ -4,24 +4,30 @@ namespace app\core;
 
 class Validate
 {
-	public static function isNameValid($name): bool
-	{
-		if (preg_match('/^[a-zA-Zа-яёА-ЯЁ\s\-]+$/u', $name)) {
-			$valid = true;
-		} else {
-			$valid = false;
-		}
 
-		return $valid;
-	}
+    private static array $types = [
+        'image/jpg',
+        'image/jpeg',
+        'image/gif',
+        'image/webp',
+        'text/plain'
+    ];
 
-	public static function isEmailValid($email): bool
-	{
-		if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			$valid = true;
-		} else {
-			$valid = false;
-		}
-		return $valid;
-	}
+    public static function checkSize($size)
+    {
+        if ($size === 0) {
+            return 'File size is big';
+        } else {
+            return true;
+        }
+    }
+
+    public static function checkType($type)
+    {
+        if (!in_array($type, self::$types)) {
+            return 'File format is not available. File must be image or txt';
+        } else {
+            return true;
+        }
+    }
 }
